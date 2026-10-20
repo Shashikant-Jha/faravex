@@ -1,0 +1,16 @@
+# Exact versions verified on the main machine (2026-10-09, Python 3.13.12, torch 2.14.0+cu130).
+# Used by: start.bat -Locked   (when a fresh resolve of requirements.txt conflicts)
+transformers==5.19.0
+sentence-transformers==6.1.0
+mcp==1.30.0
+pathspec==1.1.1
+numpy==2.5.2
+pillow==12.3.0
+tokenizers==0.23.2
+safetensors==0.8.0
+huggingface-hub==1.32.0
+scipy==1.18.1
+scikit-learn==1.9.1
+anyio==4.15.1
+starlette==1.6.0
+uvicorn==0.53.0

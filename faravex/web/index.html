@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faravex</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/jetbrains-mono-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="ui.css">
+  <script src="ui.js" defer></script>
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <span class="app">faravex</span>
+    <form class="pathform" data-pathform>
+      <input class="path" name="path" placeholder="C:\path\to\project" autocomplete="off" spellcheck="false" list="recent" data-path>
+      <datalist id="recent" data-recent></datalist>
+      <button class="btn" type="button" data-browse>Browse</button>
+      <button class="btn btn-primary" type="submit">Map</button>
+    </form>
+    <span class="status" data-status>Pick a project folder.</span>
+    <button class="btn btn-sm guide-btn" type="button" data-guide title="Guided tour of every feature">? Guide</button>
+  </header>
+
+  <div class="shell">
+    <nav class="rail" aria-label="Views">
+      <button class="rail-btn on" type="button" data-viewbtn="map" aria-pressed="true" aria-label="Map" title="Map: how the files depend on each other">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="9" cy="18" r="2.5"/><path d="M8.5 6.2l7 1.4M6.8 8.4l1.5 7.2M16.6 10.1l-5.9 6.1"/></svg>
+      </button>
+      <button class="rail-btn" type="button" data-viewbtn="record" aria-pressed="false" aria-label="Record" title="Record: what a running app executes, per request, with timings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle class="dot" cx="12" cy="12" r="3.5"/></svg>
+      </button>
+      <button class="rail-btn" type="button" data-viewbtn="calls" aria-pressed="false" aria-label="Calls" title="Calls: every MCP tool call with its time and rough token cost">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>
+      </button>
+    </nav>
+    <div class="view" data-viewpane="map">
+    <div class="tools">
+      <label class="tog"><input type="checkbox" data-show="import" checked><span class="sw sw-import"></span>imports <i data-count="import">0</i></label>
+      <label class="tog"><input type="checkbox" data-show="ref" checked><span class="sw sw-ref"></span>doc refs <i data-count="ref">0</i></label>
+      <label class="tog"><input type="checkbox" data-show="semantic" checked><span class="sw sw-sem"></span>semantic <i data-count="semantic">0</i></label>
+      <label class="tog"><input type="checkbox" data-show="unlinked"><span class="sw"></span>unlinked files <i data-count="unlinked">0</i></label>
+      <input class="filter" type="search" placeholder="filter files" data-filter>
+      <input class="filter search" type="search" placeholder="search: meaning or name" data-search disabled title="Search by meaning and exact text (needs the index)">
+      <button class="btn btn-sm" type="button" data-changes disabled title="Your uncommitted git changes: what uses them, similar code, tests to run">Changes</button>
+      <button class="btn btn-sm" type="button" data-fit>Fit</button>
+      <button class="btn btn-sm" type="button" data-relayout disabled title="Forget dragged positions">Reset layout</button>
+      <span class="grow"></span>
+      <span class="idx" data-indexinfo></span>
+      <button class="btn btn-sm" type="button" data-index disabled>Index</button>
+    </div>
+
+    <main class="main">
+      <section class="canvas" data-canvas>
+        <svg class="map" data-map aria-label="Dependency map"><g data-view><g data-edges></g><g data-nodes></g></g></svg>
+        <div class="empty" data-empty>
+          <p>Select a folder to map it.</p>
+          <p class="muted">Edges come from the files: code imports, files named in docs and specs, and (after indexing) semantic links between docs and code from EmbeddingGemma2.</p>
+        </div>
+        <div class="results" data-results hidden>
+          <p class="panel-head"><span data-rhead>Results</span><button class="btn btn-sm" type="button" data-rcopy hidden title="Copy the source of only the functions that ran">Copy slice</button><button class="btn btn-sm" type="button" data-rclear>Clear</button></p>
+          <ol class="rlist" data-rlist></ol>
+        </div>
+        <p class="legend"><span class="k-code">code</span><span class="k-doc">doc / spec</span><span class="k-config">config</span></p>
+      </section>
+      <aside class="side" data-side hidden>
+        <div class="panel">
+          <p class="panel-head"><span data-kind>file</span><span class="hl" data-sel></span><button class="btn btn-sm" type="button" data-copy title="Copy this file, the signatures it imports, its call sites and doc mentions, ready to paste into any chat">Copy context</button></p>
+          <dl class="info" data-info></dl>
+        </div>
+        <div class="panel grow-panel">
+          <p class="panel-head"><span>Preview</span><span data-prevnote></span></p>
+          <div class="code"><pre class="gutter" aria-hidden="true" data-gutter></pre><pre class="src"><code data-code></code></pre></div>
+        </div>
+      </aside>
+    </main>
+    </div>
+    <div class="view" data-viewpane="record" hidden>
+      <div class="tools">
+        <input class="filter port" type="text" inputmode="url" placeholder="app port or page URL" data-port title="Port of a running Python 3.12+ app, or a page URL (http://localhost:5173/) to record its JS/TS in Chrome/Edge">
+        <button class="btn btn-sm" type="button" data-trace disabled title="Record what the app on that port runs, one entry per request">Record</button>
+        <select class="filter sessions" data-sessions title="Recordings" disabled></select>
+        <select class="filter sessions" data-compare title="Compare this recording with another one of this folder" disabled><option value="">compare with…</option></select>
+        <button class="btn btn-sm" type="button" data-pin disabled title="Pinned recordings are never cleaned up (the newest 50 others are kept); they stay on this machine">Pin</button>
+        <span class="idx" data-recinfo></span>
+        <span class="grow"></span>
+        <button class="btn btn-sm" type="button" data-reccopy disabled title="Copy the source of every function that ran in this recording">Copy slice</button>
+      </div>
+      <section class="runs" data-runs aria-live="polite">
+        <div class="cmp" data-cmp hidden></div>
+        <div class="runs-empty muted" data-runsempty>
+          <p>Record what a running Python 3.12+ app or a web page executes: one entry per request or browser task, with the time spent in each function.</p>
+          <p>Map the app's folder, type the port it listens on (Python) or a page URL (JS/TS: opens in Chrome or Edge) and press Record. Then use the app.</p>
+        </div>
+      </section>
+    </div>
+    <div class="view" data-viewpane="calls" hidden>
+      <div class="tools">
+        <span class="idx" data-callinfo></span>
+        <span class="grow"></span>
+        <button class="btn btn-sm" type="button" data-callsref>Refresh</button>
+      </div>
+      <section class="runs" data-calls aria-live="polite"></section>
+    </div>
+  </div>
+
+  <dialog class="picker" data-picker>
+    <form method="dialog" class="picker-in">
+      <p class="panel-head"><span>Select folder</span><button class="btn btn-sm" value="cancel">Close</button></p>
+      <p class="crumb" data-crumb></p>
+      <ul class="dirs" data-dirs></ul>
+      <p class="picker-actions">
+        <button class="btn btn-sm" type="button" data-up>Up</button>
+        <button class="btn btn-sm btn-primary" type="button" data-choose>Use this folder</button>
+      </p>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Local environment (rebuilt by start.bat)
+.venv/
+.tools/
+__pycache__/
+*.pyc
+
+# Model weights (~1.5 GB) and per-project indexes: copy the model by hand, indexes rebuild themselves
+models/
+indexes/

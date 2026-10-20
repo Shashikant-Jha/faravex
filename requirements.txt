@@ -1,0 +1,8 @@
+# Installed by start.bat (scripts\setup.ps1). torch is installed first from the PyTorch index that
+# matches the GPU driver (CUDA 13.0 / 12.6, or CPU), so it is not listed here.
+transformers>=5.18  # first release with embedding_gemma2
+sentence-transformers>=5.1
+mcp>=1.30,<2  # auto DNS-rebinding protection on 127.0.0.1 (verified in 1.30)
+pathspec>=0.12
+numpy>=2
+pillow>=10  # EmbeddingGemma2Processor imports PIL even for text-only use
